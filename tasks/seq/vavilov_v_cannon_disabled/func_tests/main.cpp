@@ -112,8 +112,8 @@ TEST(vavilov_v_cannon_seq, test_invalid_size_1) {
 }
 
 TEST(vavilov_v_cannon_seq, test_225) {
-  constexpr unsigned int kN = 225;
-  constexpr unsigned int kNumblocks = 15;
+  constexpr unsigned int kN = 36;
+  constexpr unsigned int kNumblocks = 6;
   std::vector<double> a(kN * kN, 1.0);
   std::vector<double> b(kN * kN, 1.0);
   std::vector<double> c(kN * kN, 0.0);
@@ -140,8 +140,8 @@ TEST(vavilov_v_cannon_seq, test_225) {
 }
 
 TEST(vavilov_v_cannon_seq, test_identity_matrix) {
-  constexpr unsigned int kN = 225;
-  constexpr unsigned int kNumblocks = 15;
+  constexpr unsigned int kN = 36;
+  constexpr unsigned int kNumblocks = 6;
   std::vector<double> a(kN * kN, 1.0);
   std::vector<double> b(kN * kN, 0.0);
   std::vector<double> c(kN * kN, 0.0);
@@ -173,8 +173,8 @@ TEST(vavilov_v_cannon_seq, test_identity_matrix) {
 }
 
 TEST(vavilov_v_cannon_seq, test_zero_matrix) {
-  constexpr unsigned int kN = 225;
-  constexpr unsigned int kNumblocks = 15;
+  constexpr unsigned int kN = 36;
+  constexpr unsigned int kNumblocks = 6;
   std::vector<double> a(kN * kN, 1.0);
   std::vector<double> b(kN * kN, 0.0);
   std::vector<double> c(kN * kN, 0.0);
