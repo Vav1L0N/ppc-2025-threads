@@ -174,7 +174,7 @@ TEST(vavilov_v_cannon_seq, test_identity_matrix) {
 
 TEST(vavilov_v_cannon_seq, test_zero_matrix) {
   constexpr unsigned int kN = 36;
-  constexpr unsigned int kNumblocks = 3;
+  constexpr unsigned int kNumblocks = 6;
   std::vector<double> a(kN * kN, 1.0);
   std::vector<double> b(kN * kN, 0.0);
   std::vector<double> c(kN * kN, 0.0);
