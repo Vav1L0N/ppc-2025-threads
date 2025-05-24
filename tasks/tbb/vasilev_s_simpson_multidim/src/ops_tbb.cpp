@@ -47,7 +47,7 @@ bool vasilev_s_simpson_multidim::SimpsonTaskTbb::RunImpl() {
   oneapi::tbb::task_arena arena(ppc::util::GetPPCNumThreads());
   double isum = arena.execute([&] {
     return oneapi::tbb::parallel_reduce(
-        oneapi::tbb::blocked_range<std::size_t>(0, gridcap_), 0.,
+        oneapi::tbb::blocked_range<std::size_t>(0, gridcap_, gridcap_ / arena.max_concurrency()), 0.,
         [&](const tbb::blocked_range<std::size_t>& r, double threadsum) {
           std::vector<double> coordbuf(arity_);
           for (std::size_t ip = r.begin(); ip < r.end(); ip++) {

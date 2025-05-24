@@ -21,7 +21,7 @@ std::vector<double> CreateVector(size_t size) {
 }  // namespace
 
 TEST(petrov_a_radix_double_batcher_tbb, test_pipeline_run) {
-  auto in = CreateVector(22222222);
+  auto in = CreateVector(22222000);
   std::vector<double> out(in.size());
 
   auto task_data_tbb = std::make_shared<ppc::core::TaskData>();
@@ -44,12 +44,11 @@ TEST(petrov_a_radix_double_batcher_tbb, test_pipeline_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->PipelineRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-
-  ASSERT_EQ(std::ranges::is_sorted(out), true);
+  ASSERT_TRUE(std::ranges::is_sorted(out));
 }
 
 TEST(petrov_a_radix_double_batcher_tbb, test_task_run) {
-  auto in = CreateVector(22222222);
+  auto in = CreateVector(22222000);
   std::vector<double> out(in.size());
 
   auto task_data_tbb = std::make_shared<ppc::core::TaskData>();
@@ -72,6 +71,5 @@ TEST(petrov_a_radix_double_batcher_tbb, test_task_run) {
   auto perf_analyzer = std::make_shared<ppc::core::Perf>(task);
   perf_analyzer->TaskRun(perf_attr, perf_results);
   ppc::core::Perf::PrintPerfStatistic(perf_results);
-
-  ASSERT_EQ(std::ranges::is_sorted(out), true);
+  ASSERT_TRUE(std::ranges::is_sorted(out));
 }

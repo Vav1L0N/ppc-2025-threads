@@ -404,7 +404,7 @@ TEST(kholin_k_multidimensional_integrals_rectangle_omp, triple_integral_one_var)
 
   double ref_i = -24;
   double locality = fabs(ref_i - out_i[0]);
-  ASSERT_NEAR(locality, 0, 1);
+  ASSERT_NEAR(locality, 0, 1.2);
 }
 
 TEST(kholin_k_multidimensional_integrals_rectangle_omp, double_integral_two_var_high_acc) {

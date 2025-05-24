@@ -5,6 +5,7 @@
 #include <compare>
 #include <cstddef>
 #include <iterator>
+#include <numeric>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -58,39 +59,75 @@ class TestTaskSTL : public ppc::core::Task {
 template <typename Iterator, typename Comparator>
 void ermolaev_v_graham_scan_stl::TestTaskSTL::ParallelSort(Iterator begin, Iterator end, Comparator comp) {
   const size_t n = std::distance(begin, end);
-  const int num_threads = ppc::util::GetPPCNumThreads();
-  std::vector<std::thread> threads;
-  std::vector<size_t> chunk_offsets(num_threads + 1);
 
-  {
-    int i = 0;
-    std::transform(chunk_offsets.begin(), chunk_offsets.end(), chunk_offsets.begin(),
-                   [&](size_t _) { return ((i++) * n) / num_threads; });
+  int num_threads = ppc::util::GetPPCNumThreads();
+  std::vector<std::thread> threads;
+  threads.reserve(num_threads);
+  std::vector<size_t> chunk_boundaries(num_threads + 1);
+  for (size_t i = 0; i <= static_cast<size_t>(num_threads); i++) {
+    auto boundary = std::max((i * n) / num_threads, i);
+    if (boundary > n) {
+      boundary = n;
+    }
+
+    chunk_boundaries[i] = boundary;
   }
 
   for (int i = 0; i < num_threads; i++) {
-    threads.emplace_back([&, i]() { std::sort(begin + chunk_offsets[i], begin + chunk_offsets[i + 1], comp); });
+    threads.emplace_back([=]() { std::sort(begin + chunk_boundaries[i], begin + chunk_boundaries[i + 1], comp); });
   }
-
   for (auto& t : threads) {
     t.join();
   }
+  threads.clear();
 
   std::vector<typename std::iterator_traits<Iterator>::value_type> buffer(n);
 
-  auto buffer_begin = buffer.begin();
-  std::copy(begin, begin + chunk_offsets[1], buffer_begin);
+  Iterator current_src_it = begin;
+  Iterator current_dst_it = buffer.begin();
+  bool result_in_original_array = true;
 
-  for (int i = 1; i < num_threads; i++) {
-    auto left_begin = buffer_begin;
-    auto left_end = buffer_begin + chunk_offsets[i] - chunk_offsets[0];
-    auto right_begin = begin + chunk_offsets[i];
-    auto right_end = begin + chunk_offsets[i + 1];
+  std::vector<size_t> active_boundaries = chunk_boundaries;
 
-    std::merge(left_begin, left_end, right_begin, right_end, begin, comp);
-    if (i < num_threads - 1) {
-      std::copy(begin, begin + chunk_offsets[i + 1], buffer_begin);
+  while (active_boundaries.size() - 1 > 1) {
+    std::vector<size_t> next_boundaries;
+    next_boundaries.push_back(0);
+    size_t num_current_segments = active_boundaries.size() - 1;
+    threads.reserve((num_current_segments + 1) / 2);
+
+    for (size_t i = 0; i < num_current_segments / 2; ++i) {
+      Iterator s1_begin = current_src_it + active_boundaries[2 * i];
+      Iterator s1_end = current_src_it + active_boundaries[2 * i + 1];
+      Iterator s2_begin = current_src_it + active_boundaries[2 * i + 1];
+      Iterator s2_end = current_src_it + active_boundaries[2 * i + 2];
+      Iterator d_begin = current_dst_it + active_boundaries[2 * i];
+
+      threads.emplace_back([=]() { std::merge(s1_begin, s1_end, s2_begin, s2_end, d_begin, comp); });
+      next_boundaries.push_back(active_boundaries[2 * i + 2]);
     }
+
+    if (num_current_segments % 2 != 0) {
+      size_t last_segment_original_idx = num_current_segments - 1;
+      Iterator s_begin = current_src_it + active_boundaries[last_segment_original_idx];
+      Iterator s_end = current_src_it + active_boundaries[last_segment_original_idx + 1];
+      Iterator d_begin = current_dst_it + active_boundaries[last_segment_original_idx];
+
+      threads.emplace_back([=]() { std::copy(s_begin, s_end, d_begin); });
+      next_boundaries.push_back(active_boundaries[last_segment_original_idx + 1]);
+    }
+
+    for (auto& t : threads) {
+      t.join();
+    }
+    threads.clear();
+
+    active_boundaries = next_boundaries;
+    std::swap(current_src_it, current_dst_it);
+    result_in_original_array = !result_in_original_array;
+  }
+
+  if (!result_in_original_array) {
+    std::copy(current_src_it, current_src_it + n, begin);
   }
 }
 

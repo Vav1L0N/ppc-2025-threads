@@ -24,7 +24,7 @@ TEST(kazunin_n_montecarlo_omp, test_pipeline_run) {
   const std::size_t n = 10;
   std::array<std::pair<double, double>, n> limits;
   std::ranges::fill(limits, std::make_pair(0.0, 1.0));
-  std::size_t precision = 4200000;
+  std::size_t precision = 4150000;
   const auto f = [](const std::array<double, n> &args) {
     return std::accumulate(args.begin(), args.end(), 1.0,
                            [](const double acc, const double coord) { return acc + (sin(coord) * cos(coord)); });
@@ -67,7 +67,7 @@ TEST(kazunin_n_montecarlo_omp, test_task_run) {
   const std::size_t n = 10;
   std::array<std::pair<double, double>, n> limits;
   std::ranges::fill(limits, std::make_pair(0.0, 1.0));
-  std::size_t precision = 4200000;
+  std::size_t precision = 4150000;
   const auto f = [](const std::array<double, n> &args) {
     return std::accumulate(args.begin(), args.end(), 1.0,
                            [](const double acc, const double coord) { return acc + (sin(coord) * cos(coord)); });

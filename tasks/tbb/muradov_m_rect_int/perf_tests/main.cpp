@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -27,7 +26,7 @@ TEST(muradov_m_rect_int_tbb, test_pipeline_run) {
 
   // Create Task
   auto test_task_tbbuential = std::make_shared<muradov_m_rect_int_tbb::RectIntTaskTBBPar>(
-      task_data_tbb, [](const auto &args) { return (args[0] * args[1]) + std::pow(args[1], 2); });
+      task_data_tbb, [](const auto &args) { return (args[0] * args[1]) + (args[1] * args[1]); });
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();
@@ -65,7 +64,7 @@ TEST(muradov_m_rect_int_tbb, test_task_run) {
 
   // Create Task
   auto test_task_tbbuential = std::make_shared<muradov_m_rect_int_tbb::RectIntTaskTBBPar>(
-      task_data_tbb, [](const auto &args) { return (args[0] * args[1]) + std::pow(args[1], 2); });
+      task_data_tbb, [](const auto &args) { return (args[0] * args[1]) + (args[1] * args[1]); });
 
   // Create Perf attributes
   auto perf_attr = std::make_shared<ppc::core::PerfAttr>();

@@ -18,46 +18,23 @@ bool ermolaev_v_graham_scan_stl::TestTaskSTL::IsAllCollinear() {
   }
 
   Point p1 = input_[0];
-  Point p2 = input_[1];
+  Point p2;
+  bool found_second_distinct = false;
 
-  if (any_of(input_.begin() + 2, input_.end(), [&](const Point &p) { return CrossProduct(p1, p2, p) != 0; })) {
-    return false;
-  }
-
-  int num_threads = ppc::util::GetPPCNumThreads();
-  int input_size = static_cast<int>(input_.size());
-  int chunk_size = input_size / num_threads;
-  bool found_non_collinear = false;
-
-  std::vector<std::thread> threads;
-
-  auto worker = [&](int start, int end) {
-    bool local_found = false;
-    for (int i = start; i < end && !local_found; i++) {
-      for (int j = i + 1; j < input_size && !local_found; j++) {
-        for (int k = j + 1; k < input_size && !local_found; k++) {
-          if (CrossProduct(input_[i], input_[j], input_[k]) != 0) {
-            found_non_collinear = true;
-            return;
-          }
-        }
-      }
+  for (size_t i = 1; i < input_.size(); ++i) {
+    if (input_[i] != p1) {
+      p2 = input_[i];
+      found_second_distinct = true;
+      break;
     }
-  };
-
-  int start = 0;
-  int end = 0;
-  for (int i = 0; i < num_threads; i++) {
-    start = i * chunk_size;
-    end = (i == num_threads - 1) ? input_size : start + chunk_size;
-    threads.emplace_back(worker, start, end);
   }
 
-  for (auto &t : threads) {
-    t.join();
+  if (!found_second_distinct) {
+    return true;
   }
 
-  return !found_non_collinear;
+  return std::all_of(input_.begin(), input_.end(),
+                     [&](const auto &p_check) { return CrossProduct(p1, p2, p_check) == 0; });
 }
 
 bool ermolaev_v_graham_scan_stl::TestTaskSTL::IsAllSame() {

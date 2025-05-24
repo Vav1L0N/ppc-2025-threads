@@ -16,7 +16,7 @@ namespace {
 std::vector<double> GetRandomVector(int len) {
   std::random_device dev;
   std::mt19937 gen(dev());
-  std::uniform_int_distribution<> distr(0, 100);
+  std::uniform_int_distribution<> distr(-100, 100);
   std::vector<double> vec(len);
   size_t vec_size = vec.size();
   for (size_t i = 0; i < vec_size; i++) {
